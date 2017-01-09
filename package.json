@@ -1,0 +1,33 @@
+{
+    "name":                 "interlocutor",
+    "version":              "9.9.9",
+    "description":
+
+        "Invoke Sencha Connect middleware without an HTTP server.",
+
+    "keywords":
+    [
+                            "http", "connect"
+    ],
+    "author":               "Alan Gutierrez <alan@prettyrobots.com>",
+    "homepage":             "https://github.com/bigeasy/interlocutor",
+    "bugs":                 "https://github.com/bigeasy/interlocutor/issues",
+    "license":              "MIT",
+    "repository":
+    {
+                            "type": "git",
+                            "url": "http://github.com/bigeasy/interlocutor.git"
+    },
+    "dependencies":
+    {
+    },
+    "devDependencies":
+    {
+                            "proof":                        "1.2.x"
+    },
+    "main":                 "interlocutor",
+    "scripts":
+    {
+                            "test": "proof platform win32 && proof test */*.t.js || t/test"
+    }
+}
