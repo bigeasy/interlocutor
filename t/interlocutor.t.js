@@ -1,4 +1,4 @@
-require('proof/redux')(1, require('cadence')(prove))
+require('proof/redux')(3, require('cadence')(prove))
 
 function prove (async, assert) {
     var delta = require('delta')
@@ -15,5 +15,11 @@ function prove (async, assert) {
         request.end()
     }, function (response) {
         assert(response.headers, {}, 'headers')
+        async(function () {
+            delta(async()).ee(response).on('data', []).on('end')
+        }, function (data) {
+            assert(Buffer.concat(data).toString(), 'Hello, World!', 'body')
+            assert(response.footers, null, 'null footer')
+        })
     })
 }
