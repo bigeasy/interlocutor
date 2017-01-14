@@ -28,7 +28,7 @@ Interlocutor.prototype.request = function (options) {
         rawHeaders: options.rawHeaders || this._rawHeaders(headers),
         stream: input
     })
-    var response = new Response({ events: input })
+    var response = new Response({ events: input, stream: new stream.PassThrough })
     process.nextTick(this._middleware.bind(null, request, response))
     return input
 }

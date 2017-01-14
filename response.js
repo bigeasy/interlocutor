@@ -1,9 +1,10 @@
 var stream = require('stream')
 var util = require('util')
+var assert = require('assert')
 
 function Response (options) {
     this._events = options.events
-    this._stream = new stream.PassThrough
+    this._stream = options.stream
     this._stream.statusCode = 200
     this._stream.statusMessage = null
     this._stream.headers = {}
@@ -24,9 +25,7 @@ Response.prototype._sendHeaders = function () {
 
 Response.prototype._write = function (chunk, encoding, callback) {
     this._sendHeaders()
-    if (encoding != 'buffer') {
-        chunk = chunk.toString(encoding)
-    }
+    assert(encoding == 'buffer', 'strings not encoded')
     if (this._stream.write(chunk)) {
         callback()
     } else {
