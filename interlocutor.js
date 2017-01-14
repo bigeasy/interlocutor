@@ -29,7 +29,7 @@ Interlocutor.prototype.request = function (options) {
         stream: input
     })
     var response = new Response({ events: input })
-    process.nextTick(this._middleware, request, response)
+    process.nextTick(this._middleware.bind(null, request, response))
     return input
 }
 
