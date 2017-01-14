@@ -7,7 +7,7 @@ function Response (options) {
     this._stream.statusCode = 200
     this._stream.statusMessage = 'OK'
     this._stream.headers = {}
-    this._stream.footers = null
+    this._stream.trailers = null
     this.headersSent = false
     this.once('finish', this._finished.bind(this))
     this.once('error', this._erroneous.bind(this))
