@@ -1,4 +1,4 @@
-require('proof/redux')(3, require('cadence')(prove))
+require('proof/redux')(6, require('cadence')(prove))
 
 function prove (async, assert) {
     var delta = require('delta')
@@ -8,8 +8,21 @@ function prove (async, assert) {
         switch (request.headers.select) {
         default:
             var message = new Buffer('Hello, World!')
-            response.writeHead(200, 'OK', { 'content-length': message.length })
-            response.write(message)
+            var vargs = [ 200 ]
+            var headers = {}
+            for (var name in request.headers) {
+                if (name == 'status-message') {
+                    vargs.push(request.headers[name])
+                } else {
+                    headers[name] = request.headers[name]
+                }
+            }
+            if (Object.keys(headers).length != 0) {
+                vargs.push(headers)
+            }
+            response.writeHead.apply(response, vargs)
+            response.write(new Buffer('Hello, '))
+            response.write(new Buffer('World!'))
             response.end()
         }
     })
@@ -33,6 +46,11 @@ function prove (async, assert) {
     }, function (buffer, response) {
         assert(buffer.toString(), 'Hello, World!', 'hello')
         assert(response.headers, {}, 'no headers')
+        assert(response.trailers, null, 'null trailers')
+        fetch({ headers: { 'status-message': 'OK', key: 'value' } }, async())
+    }, function (buffer, response) {
+        assert(buffer.toString(), 'Hello, World!', 'hello')
+        assert(response.headers, { key: 'value' }, 'no headers')
         assert(response.trailers, null, 'null trailers')
     })
 }

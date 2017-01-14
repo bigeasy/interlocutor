@@ -5,7 +5,7 @@ function Response (options) {
     this._events = options.events
     this._stream = new stream.PassThrough
     this._stream.statusCode = 200
-    this._stream.statusMessage = 'OK'
+    this._stream.statusMessage = null
     this._stream.headers = {}
     this._stream.trailers = null
     this.headersSent = false
@@ -15,10 +15,15 @@ function Response (options) {
 }
 util.inherits(Response, stream.Writable)
 
-Response.prototype._write = function (chunk, encoding, callback) {
+Response.prototype._sendHeaders = function () {
     if (!this.headersSent) {
         this._events.emit('response', this._stream)
+        this.headersSent = true
     }
+}
+
+Response.prototype._write = function (chunk, encoding, callback) {
+    this._sendHeaders()
     if (encoding != 'buffer') {
         chunk = chunk.toString(encoding)
     }
@@ -56,6 +61,16 @@ Response.prototype.writeContinue = function () {
 }
 
 Response.prototype.writeHead = function () {
+    var vargs = Array.prototype.slice.call(arguments)
+    this._stream.statusCode = vargs.shift()
+    var statusMessage = vargs.shift()
+    if (statusMessage != null) {
+        this._stream.statusMessage = statusMessage
+    }
+    var headers = vargs.shift() || {}
+    for (var name in headers) {
+        this._stream.headers[name] = headers[name]
+    }
 }
 
 module.exports = Response
