@@ -1,4 +1,4 @@
-require('proof/redux')(6, require('cadence')(prove))
+require('proof/redux')(5, require('cadence')(prove))
 
 function prove (async, assert) {
     var delta = require('delta')
@@ -13,6 +13,8 @@ function prove (async, assert) {
             for (var name in request.headers) {
                 if (name == 'status-message') {
                     vargs.push(request.headers[name])
+                } else if (name == 'trailer') {
+                    response.addTrailers({ trailer: request.headers[name] })
                 } else {
                     headers[name] = request.headers[name]
                 }
@@ -49,8 +51,9 @@ function prove (async, assert) {
         assert(response.trailers, null, 'null trailers')
         fetch({ headers: { 'status-message': 'OK', key: 'value' } }, async())
     }, function (buffer, response) {
-        assert(buffer.toString(), 'Hello, World!', 'hello')
         assert(response.headers, { key: 'value' }, 'no headers')
-        assert(response.trailers, null, 'null trailers')
+        fetch({ headers: { 'status-message': 'OK', trailer: 'value' } }, async())
+    }, function (buffer, response) {
+        assert(response.trailers, { trailer: 'value' }, 'trailers')
     })
 }

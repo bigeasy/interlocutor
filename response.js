@@ -41,22 +41,27 @@ Response.prototype._erroneous = function (error) {
     this._stream.emit('error', error)
 }
 
-Response.prototype.addTrailers = function () {
+Response.prototype.addTrailers = function (trailers) {
+    this._stream.trailers = trailers
 }
 
-Response.prototype.getHeader = function () {
+Response.prototype.getHeader = function (name) {
+    return this._stream.headers[name.toLowerCase()]
 }
 
-Response.prototype.removeHeader = function () {
+Response.prototype.removeHeader = function (name) {
+    delete this._stream.headers[name.toLowerCase()]
 }
 
-Response.prototype.setHeader = function () {
+Response.prototype.setHeader = function (name, value) {
+    this._stream.headers[name.toLowerCase()] = value
 }
 
 Response.prototype.setTimeout = function () {
 }
 
 Response.prototype.writeContinue = function () {
+    this._events.emit('continue')
 }
 
 Response.prototype.writeHead = function () {

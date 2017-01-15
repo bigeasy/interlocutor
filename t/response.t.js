@@ -1,4 +1,4 @@
-require('proof')(1, require('cadence')(prove))
+require('proof')(4, require('cadence')(prove))
 
 function prove (async, assert) {
     var util = require('util')
@@ -22,6 +22,12 @@ function prove (async, assert) {
         events: new stream.PassThrough(),
         stream: congested
     })
+
+    assert(response.getHeader('name') == null, 'get null header')
+    response.setHeader('name', 'value')
+    assert(response.getHeader('name'), 'value', 'set header')
+    response.removeHeader('name')
+    assert(response.getHeader('name') == null, 'header removed')
 
     async(function () {
         response.write(new Buffer('Hello, World!'), async())
