@@ -16,7 +16,7 @@ util.inherits(Request, stream.Readable)
 
 Request.prototype._read = function (n) {
     for (;;) {
-        var chunk = this._stream.read(0)
+        var chunk = this._stream.read(n)
         if (chunk == null) {
             this.push(new Buffer(0))
             break

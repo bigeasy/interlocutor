@@ -1,4 +1,4 @@
-require('proof/redux')(5, require('cadence')(prove))
+require('proof/redux')(7, require('cadence')(prove))
 
 function prove (async, assert) {
     var delta = require('delta')
@@ -22,6 +22,9 @@ function prove (async, assert) {
             if (Object.keys(headers).length != 0) {
                 vargs.push(headers)
             }
+            if (request.method == 'POST') {
+                request.on('data', function (chunk) { assert(chunk.toString(), '123', 'post') })
+            }
             response.writeHead.apply(response, vargs)
             response.write(new Buffer('Hello, '))
             response.write(new Buffer('World!'))
@@ -29,11 +32,9 @@ function prove (async, assert) {
         }
     })
 
-    var fetch = cadence(function (async, options) {
+    var fetch = cadence(function (async, request) {
         async(function () {
-            var request = interlocutor.request(options)
             delta(async()).ee(request).on('response')
-            request.end()
         }, function (response) {
             async(function () {
                 delta(async()).ee(response).on('data', []).on('end')
@@ -44,16 +45,20 @@ function prove (async, assert) {
     })
 
     async(function () {
-        fetch({}, async())
+        var request = interlocutor.request({ method: 'POST' })
+        fetch(request, async())
+        request.write('123')
+        request.end()
     }, function (buffer, response) {
         assert(buffer.toString(), 'Hello, World!', 'hello')
         assert(response.headers, {}, 'no headers')
         assert(response.trailers, null, 'null trailers')
-        fetch({ headers: { 'status-message': 'OK', key: 'value' } }, async())
+        var request = interlocutor.request({ headers: { 'status-message': 'OK', key: 'value' } })
+        fetch(request, async())
+        request.end()
     }, function (buffer, response) {
-        assert(response.headers, { key: 'value' }, 'no headers')
-        fetch({ headers: { 'status-message': 'OK', trailer: 'value' } }, async())
-    }, function (buffer, response) {
-        assert(response.trailers, { trailer: 'value' }, 'trailers')
+        assert(buffer.toString(), 'Hello, World!', 'hello')
+        assert(response.headers, { key: 'value' }, 'headers')
+        assert(response.trailers, null, 'null trailers')
     })
 }
