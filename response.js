@@ -1,12 +1,12 @@
 var stream = require('stream')
 var util = require('util')
 var assert = require('assert')
+var http = require('http')
+var coalesce = require('extant')
 
 function Response (options) {
     this._events = options.events
     this._stream = options.stream
-    this._stream.statusCode = 200
-    this._stream.statusMessage = null
     this._stream.headers = {}
     this._stream.trailers = null
     this.headersSent = false
@@ -18,6 +18,8 @@ util.inherits(Response, stream.Writable)
 
 Response.prototype._sendHeaders = function () {
     if (!this.headersSent) {
+        this._stream.statusCode = coalesce(this.statusCode, 200)
+        this._stream.statusMessage = coalesce(this.statusMessage, http.STATUS_CODES[this._stream.statusCode])
         this._events.emit('response', this._stream)
         this.headersSent = true
     }
