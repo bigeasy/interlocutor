@@ -68,10 +68,10 @@ Response.prototype.writeContinue = function () {
 
 Response.prototype.writeHead = function () {
     var vargs = Array.prototype.slice.call(arguments)
-    this._stream.statusCode = vargs.shift()
+    this.statusCode = vargs.shift()
     var statusMessage = vargs.shift()
     if (statusMessage != null) {
-        this._stream.statusMessage = statusMessage
+        this.statusMessage = statusMessage
     }
     var headers = vargs.shift() || {}
     for (var name in headers) {
