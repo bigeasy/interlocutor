@@ -5,7 +5,7 @@ var http = require('http')
 var coalesce = require('extant')
 
 function Response (options) {
-    this._events = options.events
+    this._events_ = options.events
     this._stream = options.stream
     this._stream.headers = {}
     this._stream.trailers = null
@@ -20,7 +20,7 @@ Response.prototype._sendHeaders = function () {
     if (!this.headersSent) {
         this._stream.statusCode = coalesce(this.statusCode, 200)
         this._stream.statusMessage = coalesce(this.statusMessage, http.STATUS_CODES[this._stream.statusCode])
-        this._events.emit('response', this._stream)
+        this._events_.emit('response', this._stream)
         this.headersSent = true
     }
 }
@@ -63,7 +63,7 @@ Response.prototype.setTimeout = function () {
 }
 
 Response.prototype.writeContinue = function () {
-    this._events.emit('continue')
+    this._events_.emit('continue')
 }
 
 Response.prototype.writeHead = function () {
