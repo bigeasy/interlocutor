@@ -1,11 +1,19 @@
-require('proof')(7, require('cadence')(prove))
+require('proof')(9, require('cadence')(prove))
 
 function prove (async, assert) {
     var delta = require('delta')
     var cadence = require('cadence')
     var Interlocutor = require('..')
     var interlocutor = new Interlocutor(function (request, response) {
+        var trailers = null
         switch (request.headers.select) {
+        case 'headers':
+            response.setHeader('name', 'value')
+            assert(response.getHeader('name'), 'value', 'value')
+            response.removeHeader('name')
+            assert(! response.getHeader('name'), 'not value')
+            response.writeHead.apply(response, vargs)
+            trailers = { name: 'value' }
         default:
             var message = new Buffer('Hello, World!')
             var vargs = [ 200 ]
@@ -28,6 +36,9 @@ function prove (async, assert) {
             response.writeHead.apply(response, vargs)
             response.write(new Buffer('Hello, '))
             response.write(new Buffer('World!'))
+            if (trailers) {
+                response.addTrailers(trailers)
+            }
             response.end()
         }
     })
@@ -53,12 +64,12 @@ function prove (async, assert) {
         assert(buffer.toString(), 'Hello, World!', 'hello')
         assert(response.headers, {}, 'no headers')
         assert(response.trailers, null, 'null trailers')
-        var request = interlocutor.request({ headers: { 'status-message': 'OK', key: 'value' } })
+        var request = interlocutor.request({ headers: { select: 'headers', 'status-message': 'OK', key: 'value' } })
         fetch(request, async())
         request.end()
     }, function (buffer, response) {
         assert(buffer.toString(), 'Hello, World!', 'hello')
-        assert(response.headers, { key: 'value' }, 'headers')
-        assert(response.trailers, null, 'null trailers')
+        assert(response.headers, { key: 'value', select: 'headers' }, 'headers')
+        assert(response.trailers, { name: 'value' }, 'add trailers')
     })
 }

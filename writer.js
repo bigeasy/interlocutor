@@ -6,8 +6,9 @@ var util = require('util')
 var cadence = require('cadence')
 
 function Writer (reader) {
-    this._reader = reader
     stream.Writable.call(this)
+    this._reader = reader
+    this.once('finish', function () { reader._write(null) })
 }
 util.inherits(Writer, stream.Writable)
 

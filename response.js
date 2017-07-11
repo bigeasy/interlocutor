@@ -2,79 +2,58 @@ var stream = require('stream')
 var util = require('util')
 var assert = require('assert')
 var http = require('http')
+var Writer = require('./writer')
 var coalesce = require('extant')
 
-function Response (options) {
-    this._events_ = options.events
-    this._stream = options.stream
-    this._stream.headers = {}
-    this._stream.trailers = null
+function Response (request, response) {
+    this._request = request
+    this.statusCode = 200
+    this._headers = {}
+    this._trailers = null
     this.headersSent = false
-    this.once('finish', this._finished.bind(this))
-    this.once('error', this._erroneous.bind(this))
-    stream.Writable.call(this)
+    Writer.call(this, response)
 }
-util.inherits(Response, stream.Writable)
+util.inherits(Response, Writer)
 
 Response.prototype._sendHeaders = function () {
     if (!this.headersSent) {
-        this._stream.statusCode = coalesce(this.statusCode, 200)
-        this._stream.statusMessage = coalesce(this.statusMessage, http.STATUS_CODES[this._stream.statusCode])
-        this._events_.emit('response', this._stream)
+        this.statusCode = this.statusCode
+        this.statusMessage = coalesce(this.statusMessage, http.STATUS_CODES[this.statusCode])
+        this._request.emit('response', this._reader)
         this.headersSent = true
     }
 }
 
 Response.prototype._write = function (chunk, encoding, callback) {
     this._sendHeaders()
-    assert(encoding == 'buffer', 'strings not encoded')
-    if (this._stream.write(chunk)) {
-        callback()
-    } else {
-        this._stream.once('drain', callback)
-    }
-}
-
-Response.prototype._finished = function () {
-    this._stream.emit('end')
-}
-
-Response.prototype._erroneous = function (error) {
-    this._stream.emit('error', error)
+    Writer.prototype._write.call(this, chunk, encoding, callback)
 }
 
 Response.prototype.addTrailers = function (trailers) {
-    this._stream.trailers = trailers
+    this._reader._trailers = trailers
 }
 
 Response.prototype.getHeader = function (name) {
-    return this._stream.headers[name.toLowerCase()]
+    return this._headers[name.toLowerCase()]
 }
 
 Response.prototype.removeHeader = function (name) {
-    delete this._stream.headers[name.toLowerCase()]
+    delete this._headers[name.toLowerCase()]
 }
 
 Response.prototype.setHeader = function (name, value) {
-    this._stream.headers[name.toLowerCase()] = value
-}
-
-Response.prototype.setTimeout = function () {
-}
-
-Response.prototype.writeContinue = function () {
-    this._events_.emit('continue')
+    this._headers[name.toLowerCase()] = value
 }
 
 Response.prototype.writeHead = function () {
     var vargs = Array.prototype.slice.call(arguments)
-    this.statusCode = vargs.shift()
+    this._reader.statusCode = vargs.shift()
     if (typeof vargs[0] == 'string') {
-        this.statusMessage = vargs.shift()
+        this._reader.statusMessage = vargs.shift()
     }
     var headers = vargs.shift() || {}
     for (var name in headers) {
-        this._stream.headers[name] = headers[name]
+        this._reader.headers[name] = headers[name]
     }
 }
 

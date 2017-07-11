@@ -1,8 +1,15 @@
 var util = require('util')
-var Request = require('./request')
-var Response = require('./response')
+var Client = {
+    Request: require('./client.request'),
+    Response: require('./client.response')
+}
+var Server = {
+    Request: require('./request'),
+    Response: require('./response')
+}
 var stream = require('stream')
 var events = require('events')
+var coalesce = require('extant')
 
 function Interlocutor (middleware) {
     this._middleware = middleware
@@ -18,19 +25,24 @@ Interlocutor.prototype._rawHeaders = function (headers) {
 }
 
 Interlocutor.prototype.request = function (options) {
-    var headers = options.headers || {}
+    var interlocutor = new Interlocutor
+    var headers = coalesce(options.headers, {})
     var input = new stream.PassThrough
-    var request = new Request({
-        httpVersion: options.httpVersion || '1.1',
-        method: options.method || 'GET',
-        url: options.url || '/',
+    var server = { request: null, response: null }
+    var client = { request: null, response: null }
+    server.request = new Server.Request({
+        httpVersion: coalesce(options.httpVersion, '1.1'),
+        method: coalesce(options.method, 'GET'),
+        // TODO Should be `path`.
+        url: coalesce(options.url || '/'),
         headers: headers,
-        rawHeaders: options.rawHeaders || this._rawHeaders(headers),
-        stream: input
+        rawHeaders: coalesce(options.rawHeaders, this._rawHeaders(headers))
     })
-    var response = new Response({ events: input, stream: new stream.PassThrough })
-    process.nextTick(this._middleware.bind(null, request, response))
-    return input
+    client.request = new Client.Request(server.request)
+    client.response = new Client.Response
+    server.response = new Server.Response(client.request, client.response)
+    process.nextTick(this._middleware.bind(null, server.request, server.response))
+    return client.request
 }
 
 module.exports = Interlocutor

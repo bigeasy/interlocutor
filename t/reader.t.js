@@ -1,4 +1,4 @@
-require('proof')(5, require('cadence')(prove))
+require('proof')(8, require('cadence')(prove))
 
 function prove (async, okay) {
     var Writer = require('../writer')
@@ -15,6 +15,11 @@ function prove (async, okay) {
         buffer = reader.read(1)
         okay(buffer, null, 'read empty')
     })
+    var end = async()
+    reader.on('end', function () {
+        okay(true, 'ended')
+        end()
+    })
     async(function () {
         writer.write(new Buffer('x'), async())
     }, function () {
@@ -24,6 +29,9 @@ function prove (async, okay) {
         buffer = reader.read(1)
         okay(buffer.toString(), 'y', 'read')
     }, function () {
-        okay(true, 'resumed')
+        okay(reader.read(1).toString(), 'z', 'last')
+        okay(reader.read(1), null, 'past last')
+        writer.end()
+        okay(reader.read(1), null, 'read end')
     })
 }
