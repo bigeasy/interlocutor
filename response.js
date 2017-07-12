@@ -17,8 +17,11 @@ util.inherits(Response, Writer)
 
 Response.prototype._sendHeaders = function () {
     if (!this.headersSent) {
-        this.statusCode = this.statusCode
-        this.statusMessage = coalesce(this.statusMessage, http.STATUS_CODES[this.statusCode])
+        this._reader.statusCode = this.statusCode
+        this._reader.statusMessage = coalesce(this.statusMessage, http.STATUS_CODES[this.statusCode])
+        for (var name in this._headers) {
+            this._reader.headers[name] = this._headers[name]
+        }
         this._request.emit('response', this._reader)
         this.headersSent = true
     }
@@ -47,14 +50,15 @@ Response.prototype.setHeader = function (name, value) {
 
 Response.prototype.writeHead = function () {
     var vargs = Array.prototype.slice.call(arguments)
-    this._reader.statusCode = vargs.shift()
+    this.statusCode = vargs.shift()
     if (typeof vargs[0] == 'string') {
-        this._reader.statusMessage = vargs.shift()
+        this.statusMessage = vargs.shift()
     }
     var headers = vargs.shift() || {}
     for (var name in headers) {
-        this._reader.headers[name] = headers[name]
+        this._headers[name] = headers[name]
     }
+    this._sendHeaders()
 }
 
 module.exports = Response

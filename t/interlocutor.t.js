@@ -1,4 +1,4 @@
-require('proof')(9, require('cadence')(prove))
+require('proof')(10, require('cadence')(prove))
 
 function prove (async, assert) {
     var delta = require('delta')
@@ -12,17 +12,15 @@ function prove (async, assert) {
             assert(response.getHeader('name'), 'value', 'value')
             response.removeHeader('name')
             assert(! response.getHeader('name'), 'not value')
-            response.writeHead.apply(response, vargs)
             trailers = { name: 'value' }
+            response.setHeader('set', 'value')
         default:
             var message = new Buffer('Hello, World!')
-            var vargs = [ 200 ]
+            var vargs = [ 201 ]
             var headers = {}
             for (var name in request.headers) {
                 if (name == 'status-message') {
                     vargs.push(request.headers[name])
-                } else if (name == 'trailer') {
-                    response.addTrailers({ trailer: request.headers[name] })
                 } else {
                     headers[name] = request.headers[name]
                 }
@@ -62,6 +60,7 @@ function prove (async, assert) {
         request.end()
     }, function (buffer, response) {
         assert(buffer.toString(), 'Hello, World!', 'hello')
+        assert(response.statusCode, 201, 'no headers')
         assert(response.headers, {}, 'no headers')
         assert(response.trailers, null, 'null trailers')
         var request = interlocutor.request({ headers: { select: 'headers', 'status-message': 'OK', key: 'value' } })
@@ -69,7 +68,7 @@ function prove (async, assert) {
         request.end()
     }, function (buffer, response) {
         assert(buffer.toString(), 'Hello, World!', 'hello')
-        assert(response.headers, { key: 'value', select: 'headers' }, 'headers')
+        assert(response.headers, { set: 'value', key: 'value', select: 'headers' }, 'headers')
         assert(response.trailers, { name: 'value' }, 'add trailers')
     })
 }
