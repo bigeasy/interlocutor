@@ -25,7 +25,6 @@ Interlocutor.prototype._rawHeaders = function (headers) {
 }
 
 Interlocutor.prototype.request = function (options) {
-    var interlocutor = new Interlocutor
     var headers = coalesce(options.headers, {})
     var input = new stream.PassThrough
     var server = { request: null, response: null }
