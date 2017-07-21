@@ -32,8 +32,7 @@ Interlocutor.prototype.request = function (options) {
     server.request = new Server.Request({
         httpVersion: coalesce(options.httpVersion, '1.1'),
         method: coalesce(options.method, 'GET'),
-        // TODO Should be `path`.
-        url: coalesce(options.url || '/'),
+        url: coalesce(options.path, '/'),
         headers: headers,
         rawHeaders: coalesce(options.rawHeaders, this._rawHeaders(headers))
     })

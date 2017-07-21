@@ -1,4 +1,4 @@
-require('proof')(10, require('cadence')(prove))
+require('proof')(11, require('cadence')(prove))
 
 function prove (async, assert) {
     var delta = require('delta')
@@ -8,6 +8,7 @@ function prove (async, assert) {
         var trailers = null
         switch (request.headers.select) {
         case 'headers':
+            assert(request.url, '/headers', 'url')
             response.setHeader('name', 'value')
             assert(response.getHeader('name'), 'value', 'value')
             response.removeHeader('name')
@@ -63,7 +64,7 @@ function prove (async, assert) {
         assert(response.statusCode, 201, 'no headers')
         assert(response.headers, {}, 'no headers')
         assert(response.trailers, null, 'null trailers')
-        var request = interlocutor.request({ headers: { select: 'headers', 'status-message': 'OK', key: 'value' } })
+        var request = interlocutor.request({ path: '/headers', headers: { select: 'headers', 'status-message': 'OK', key: 'value' } })
         fetch(request, async())
         request.end()
     }, function (buffer, response) {
