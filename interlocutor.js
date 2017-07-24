@@ -29,6 +29,9 @@ Interlocutor.prototype.request = function (options) {
     var input = new stream.PassThrough
     var server = { request: null, response: null }
     var client = { request: null, response: null }
+    if (!('transfer-encoding' in headers) && !('content-length' in headers)) {
+        headers['transfer-encoding'] = 'chunked'
+    }
     server.request = new Server.Request({
         httpVersion: coalesce(options.httpVersion, '1.1'),
         method: coalesce(options.method, 'GET'),

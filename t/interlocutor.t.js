@@ -62,14 +62,19 @@ function prove (async, assert) {
     }, function (buffer, response) {
         assert(buffer.toString(), 'Hello, World!', 'hello')
         assert(response.statusCode, 201, 'no headers')
-        assert(response.headers, {}, 'no headers')
+        assert(response.headers, { 'transfer-encoding': 'chunked' }, 'no headers')
         assert(response.trailers, null, 'null trailers')
-        var request = interlocutor.request({ path: '/headers', headers: { select: 'headers', 'status-message': 'OK', key: 'value' } })
+        var request = interlocutor.request({
+            path: '/headers',
+            headers: { select: 'headers', 'status-message': 'OK', key: 'value' }
+        })
         fetch(request, async())
         request.end()
     }, function (buffer, response) {
         assert(buffer.toString(), 'Hello, World!', 'hello')
-        assert(response.headers, { set: 'value', key: 'value', select: 'headers' }, 'headers')
+        assert(response.headers, {
+            set: 'value', key: 'value', select: 'headers', 'transfer-encoding': 'chunked'
+        }, 'headers')
         assert(response.trailers, { name: 'value' }, 'add trailers')
     })
 }
