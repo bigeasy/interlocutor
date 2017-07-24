@@ -4,8 +4,8 @@ var Client = {
     Response: require('./client.response')
 }
 var Server = {
-    Request: require('./request'),
-    Response: require('./response')
+    Request: require('./server.request'),
+    Response: require('./server.response')
 }
 var stream = require('stream')
 var events = require('events')
