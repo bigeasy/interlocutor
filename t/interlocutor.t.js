@@ -55,14 +55,17 @@ function prove (async, assert) {
     })
 
     async(function () {
-        var request = interlocutor.request({ method: 'POST' })
+        var request = interlocutor.request({
+            method: 'POST',
+            headers: { 'content-length': '3' }
+        })
         fetch(request, async())
         request.write('123')
         request.end()
     }, function (buffer, response) {
         assert(buffer.toString(), 'Hello, World!', 'hello')
         assert(response.statusCode, 201, 'no headers')
-        assert(response.headers, { 'transfer-encoding': 'chunked' }, 'no headers')
+        assert(response.headers, { 'content-length': '3' }, 'content length')
         assert(response.trailers, null, 'null trailers')
         var request = interlocutor.request({
             path: '/headers',
