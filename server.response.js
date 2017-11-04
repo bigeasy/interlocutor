@@ -54,7 +54,7 @@ Response.prototype.writeHead = function () {
     if (typeof vargs[0] == 'string') {
         this.statusMessage = vargs.shift()
     }
-    var headers = vargs.shift() || {}
+    var headers = coalesce(vargs.shift(), {})
     for (var name in headers) {
         this._headers[name] = headers[name]
     }
