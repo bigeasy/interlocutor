@@ -8,8 +8,7 @@ function Request (response) {
 util.inherits(Request, Writer)
 
 Request.prototype.abort = function () {
-    this.aborted = Date.now()
-    this.emit('abort')
+    this._abort()
 }
 
 module.exports = Request
