@@ -3,7 +3,7 @@
     "version":              "0.3.6",
     "description":
 
-        "Invoke Sencha Connect middleware without an HTTP server.",
+      "Invoke Sencha Connect middleware without an HTTP server.",
 
     "keywords":
     [
@@ -23,7 +23,7 @@
                             "cadence":                      "1.0.x",
                             "delta":                        "1.2.x",
                             "extant":                       "1.0.x",
-                            "signal":                       "3.2.x"
+                            "signal":                       "3.0.x"
     },
     "devDependencies":
     {
