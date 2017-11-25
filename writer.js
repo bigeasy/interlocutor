@@ -13,11 +13,6 @@ function Writer (reader) {
 }
 util.inherits(Writer, stream.Writable)
 
-Writer.prototype._abort = function () {
-    this.aborted = Date.now()
-    this.emit('abort')
-}
-
 // Write is simply an async write of the given buffer. The only asynchronous
 // action in our implementation it to wait for a notification from our reader if
 // it is paused.

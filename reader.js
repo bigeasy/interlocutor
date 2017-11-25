@@ -8,10 +8,12 @@ var stream = require('stream')
 // An evented semaphore.
 var Signal = require('signal')
 
+// Return the first non-null-like value.
 var coalesce = require('extant')
 
 function Reader (options) {
     this._signal = new Signal
+    this._dump = false
     stream.Readable.call(this, coalesce(options, {}))
 }
 util.inherits(Reader, stream.Readable)
@@ -28,7 +30,10 @@ Reader.prototype._read = function () {
 }
 
 Reader.prototype._write = function (chunk) {
-    this._paused = ! this.push(chunk)
+    if (!this._dump) {
+        this._ended = chunk == null
+        this._paused = ! this.push(chunk)
+    }
 }
 
 module.exports = Reader
