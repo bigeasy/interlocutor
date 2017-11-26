@@ -2,8 +2,9 @@ var util = require('util')
 
 var Writer = require('./writer')
 
-function Request (response) {
-    Writer.call(this, response)
+function Request (reader, response) {
+    this._response = response
+    Writer.call(this, reader)
 }
 util.inherits(Request, Writer)
 
@@ -13,11 +14,10 @@ Request.prototype.abort = function () {
     this.aborted = Date.now()
 
     // Any writes to the client request will now be dumped.
-    this._reader.dump = true
+    this._reader._dump = true
 
     // Get the server response which is going to receive our cancel.
-    var response = this._reader.response
-    response._reader.dump = true
+    this._response._dump = true
 
     // Hmm… What do we do if we have already ended?
     if (!this._reader._ended) {
@@ -27,10 +27,10 @@ Request.prototype.abort = function () {
 
     // If the response has sent headers, it means we created a client response.
     // That client response is going to need to get a close (or something.)
-    if (response.sentHeaders) {
-        response._reader.emit('aborted')
-        response._reader.emit('end')
-        response._reader.emit('close')
+    if (this._response._headersSent && !this._response._ended) {
+        this._response.emit('aborted')
+        this._response.emit('end')
+        this._response.emit('close')
     }
 }
 

@@ -39,10 +39,15 @@ Interlocutor.prototype.request = function (options) {
         headers: headers,
         rawHeaders: coalesce(options.rawHeaders, this._rawHeaders(headers))
     })
-    client.request = new Client.Request(server.request)
     client.response = new Client.Response
+    client.request = new Client.Request(server.request, client.response)
     server.response = new Server.Response(client.request, client.response)
-    process.nextTick(this._middleware.bind(null, server.request, server.response))
+    var middleware = this._middleware
+    process.nextTick(function () {
+        if (!server.request._dump) {
+            middleware(server.request, server.response)
+        }
+    })
     return client.request
 }
 

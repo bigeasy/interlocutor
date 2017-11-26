@@ -1,4 +1,4 @@
-require('proof')(11, require('cadence')(prove))
+require('proof')(15, require('cadence')(prove))
 
 function prove (async, assert) {
     var delta = require('delta')
@@ -7,6 +7,19 @@ function prove (async, assert) {
     var interlocutor = new Interlocutor(function (request, response) {
         var trailers = null
         switch (request.headers.select) {
+        case 'abort':
+            request.on('aborted', function () {
+                assert(true, 'server aborted')
+            })
+            request.on('close', function () {
+                assert(true, 'server closed')
+                response.write('hello, world!')
+                response.end()
+            })
+            // TODO Probably need to more liberally use `nextTick`. Put this
+            // write at the top, above the hooks and we're not going to fire.
+            response.writeHead(200)
+            break
         case 'headers':
             assert(request.url, '/headers', 'url')
             response.setHeader('name', 'value')
@@ -79,5 +92,26 @@ function prove (async, assert) {
             set: 'value', key: 'value', select: 'headers', 'transfer-encoding': 'chunked'
         }, 'headers')
         assert(response.trailers, { name: 'value' }, 'add trailers')
+        var request = interlocutor.request({
+            path: '/abort',
+            headers: { select: 'abort', 'status-message': 'OK', key: 'value' }
+        })
+        delta(async()).ee(request).on('abort')
+        request.end()
+        request.abort()
+    }, function () {
+        assert(true, 'abort before request')
+        var request = interlocutor.request({
+            path: '/abort',
+            headers: { select: 'abort', 'status-message': 'OK', key: 'value' }
+        })
+        async(function () {
+            delta(async()).ee(request).on('response')
+        }, function (response) {
+            delta(async()).ee(response).on('aborted')
+            request.abort()
+        })
+    }, function () {
+        assert(true, 'abort after response')
     })
 }

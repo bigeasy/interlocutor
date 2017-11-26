@@ -16,7 +16,8 @@ function Response (request, response) {
 util.inherits(Response, Writer)
 
 Response.prototype._sendHeaders = function () {
-    if (!this.headersSent) {
+    if (!this.headersSent && !this._reader._dump) {
+        this._reader._headersSent = true
         this._reader.statusCode = this.statusCode
         this._reader.statusMessage = coalesce(this.statusMessage, http.STATUS_CODES[this.statusCode])
         for (var name in this._headers) {
