@@ -1,6 +1,6 @@
 require('proof')(15, require('cadence')(prove))
 
-function prove (async, assert) {
+function prove (async, okay) {
     var delta = require('delta')
     var cadence = require('cadence')
     var Interlocutor = require('..')
@@ -9,10 +9,10 @@ function prove (async, assert) {
         switch (request.headers.select) {
         case 'abort':
             request.on('aborted', function () {
-                assert(true, 'server aborted')
+                okay(true, 'server aborted')
             })
             request.on('close', function () {
-                assert(true, 'server closed')
+                okay(true, 'server closed')
                 response.write('hello, world!')
                 response.end()
             })
@@ -21,11 +21,11 @@ function prove (async, assert) {
             response.writeHead(200)
             break
         case 'headers':
-            assert(request.url, '/headers', 'url')
+            okay(request.url, '/headers', 'url')
             response.setHeader('name', 'value')
-            assert(response.getHeader('name'), 'value', 'value')
+            okay(response.getHeader('name'), 'value', 'value')
             response.removeHeader('name')
-            assert(! response.getHeader('name'), 'not value')
+            okay(! response.getHeader('name'), 'not value')
             trailers = { name: 'value' }
             response.setHeader('set', 'value')
         default:
@@ -43,7 +43,7 @@ function prove (async, assert) {
                 vargs.push(headers)
             }
             if (request.method == 'POST') {
-                request.on('data', function (chunk) { assert(chunk.toString(), '123', 'post') })
+                request.on('data', function (chunk) { okay(chunk.toString(), '123', 'post') })
             }
             response.writeHead.apply(response, vargs)
             response.write(new Buffer('Hello, '))
@@ -76,10 +76,10 @@ function prove (async, assert) {
         request.write('123')
         request.end()
     }, function (buffer, response) {
-        assert(buffer.toString(), 'Hello, World!', 'hello')
-        assert(response.statusCode, 201, 'no headers')
-        assert(response.headers, { 'content-length': '3' }, 'content length')
-        assert(response.trailers, null, 'null trailers')
+        okay(buffer.toString(), 'Hello, World!', 'hello')
+        okay(response.statusCode, 201, 'no headers')
+        okay(response.headers, { 'content-length': '3' }, 'content length')
+        okay(response.trailers, null, 'null trailers')
         var request = interlocutor.request({
             path: '/headers',
             headers: { select: 'headers', 'status-message': 'OK', key: 'value' }
@@ -87,11 +87,11 @@ function prove (async, assert) {
         fetch(request, async())
         request.end()
     }, function (buffer, response) {
-        assert(buffer.toString(), 'Hello, World!', 'hello')
-        assert(response.headers, {
+        okay(buffer.toString(), 'Hello, World!', 'hello')
+        okay(response.headers, {
             set: 'value', key: 'value', select: 'headers', 'transfer-encoding': 'chunked'
         }, 'headers')
-        assert(response.trailers, { name: 'value' }, 'add trailers')
+        okay(response.trailers, { name: 'value' }, 'add trailers')
         var request = interlocutor.request({
             path: '/abort',
             headers: { select: 'abort', 'status-message': 'OK', key: 'value' }
@@ -100,7 +100,7 @@ function prove (async, assert) {
         request.end()
         request.abort()
     }, function () {
-        assert(true, 'abort before request')
+        okay(true, 'abort before request')
         var request = interlocutor.request({
             path: '/abort',
             headers: { select: 'abort', 'status-message': 'OK', key: 'value' }
@@ -112,6 +112,6 @@ function prove (async, assert) {
             request.abort()
         })
     }, function () {
-        assert(true, 'abort after response')
+        okay(true, 'abort after response')
     })
 }
