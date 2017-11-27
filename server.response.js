@@ -22,6 +22,7 @@ Response.prototype._sendHeaders = function () {
         this._reader.statusMessage = coalesce(this.statusMessage, http.STATUS_CODES[this.statusCode])
         for (var name in this._headers) {
             this._reader.headers[name] = this._headers[name]
+            this._reader.rawHeaders.push(name, this._headers[name])
         }
         this._request.emit('response', this._reader)
         this.headersSent = true
