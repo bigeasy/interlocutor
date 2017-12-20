@@ -1,13 +1,13 @@
 {
     "name":                 "interlocutor",
-    "version":              "0.4.0",
+    "version":              "0.5.1",
     "description":
 
       "Invoke Sencha Connect middleware without an HTTP server.",
 
     "keywords":
     [
-                            "http", "connect"
+                            "bluey", "http", "connect"
     ],
     "author":               "Alan Gutierrez <alan@prettyrobots.com>",
     "homepage":             "https://github.com/bigeasy/interlocutor",
