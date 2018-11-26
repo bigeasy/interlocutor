@@ -9,10 +9,10 @@ function prove (async, okay) {
         switch (request.headers.select) {
         case 'abort':
             request.on('aborted', function () {
-                okay(true, 'server aborted')
+                okay('server aborted')
             })
             request.on('close', function () {
-                okay(true, 'server closed')
+                okay('server closed')
                 response.write('hello, world!')
                 response.end()
             })
@@ -100,7 +100,7 @@ function prove (async, okay) {
         request.end()
         request.abort()
     }, function () {
-        okay(true, 'abort before request')
+        okay('abort before request')
         var request = interlocutor.request({
             path: '/abort',
             headers: { select: 'abort', 'status-message': 'OK', key: 'value' }
@@ -112,6 +112,6 @@ function prove (async, okay) {
             request.abort()
         })
     }, function () {
-        okay(true, 'abort after response')
+        okay('abort after response')
     })
 }

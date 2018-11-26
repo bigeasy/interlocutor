@@ -17,7 +17,7 @@ function prove (async, okay) {
     })
     var end = async()
     reader.on('end', function () {
-        okay(true, 'ended')
+        okay('ended')
         end()
     })
     async(function () {
