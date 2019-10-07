@@ -4,16 +4,14 @@
 // Node.js API.
 var util = require('util')
 var stream = require('stream')
-
-// An evented semaphore.
-var Signal = require('signal')
+const noop = require('nop')
 
 // Return the first non-null-like value.
 var coalesce = require('extant')
 
 function Reader (options) {
-    this._signal = new Signal
     this._dump = false
+    this._unpaused = noop
     stream.Readable.call(this, coalesce(options, {}))
 }
 util.inherits(Reader, stream.Readable)
@@ -26,7 +24,8 @@ util.inherits(Reader, stream.Readable)
 // signal our paired `Writer` to write to our `_write` method below.
 Reader.prototype._read = function () {
     this._paused = false
-    this._signal.notify()
+    this._unpaused.call()
+    this._unpaused = noop
 }
 
 Reader.prototype._write = function (chunk) {

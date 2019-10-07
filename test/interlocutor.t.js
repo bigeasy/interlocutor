@@ -3,8 +3,6 @@ require('proof')(15, prove)
 async function prove (okay) {
     const once = require('prospective/once')
 
-    var delta = require('delta')
-    var cadence = require('cadence')
     var Interlocutor = require('..')
     var interlocutor = new Interlocutor(function (request, response) {
         var trailers = null
