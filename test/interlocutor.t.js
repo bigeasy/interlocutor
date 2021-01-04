@@ -1,7 +1,7 @@
 require('proof')(15, prove)
 
 async function prove (okay) {
-    const once = require('prospective/once')
+    const once = require('eject')
 
     var Interlocutor = require('..')
     var interlocutor = new Interlocutor(function (request, response) {

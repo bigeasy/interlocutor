@@ -1,7 +1,7 @@
-require('proof')(8, prove)
+require('proof')(3, prove)
 
 async function prove (okay) {
-    const callback = require('prospective/callback')
+    const callback = require('comeuppance')
     var Writer = require('../writer')
     var Reader = require('../reader')
     var reader = new Reader({ highWaterMark: 1 })
@@ -9,12 +9,18 @@ async function prove (okay) {
     var buffer
     buffer = reader.read()
     okay(buffer, null, 'empty')
-    reader.once('readable', function () {
-        var buffer
-        buffer = reader.read(1)
-        okay(buffer.toString(), 'x', 'read')
-        buffer = reader.read(1)
-        okay(buffer, null, 'read empty')
+    const gathered = []
+    function read () {
+        for (;;) {
+            const buffer = reader.read(1)
+            if (buffer == null) {
+                break
+            }
+            gathered.push(String(buffer))
+        }
+    }
+    reader.on('readable', function () {
+        read()
     })
     const promise = {}
     const end = new Promise(resolve => promise.end = resolve)
@@ -22,15 +28,12 @@ async function prove (okay) {
         okay('ended')
         promise.end.call()
     })
-    await callback(callback => writer.write(Buffer.from('x'), callback))
-    await callback(callback => writer.write(Buffer.from('y'), callback))
+    writer.write(Buffer.from('x'))
+    writer.write(Buffer.from('y'))
     const wrote = callback(callback => writer.write(Buffer.from('z'), callback))
-    buffer = reader.read(1)
-    okay(buffer.toString(), 'y', 'read')
+    read()
     await wrote
-    okay(reader.read(1).toString(), 'z', 'last')
-    okay(reader.read(1), null, 'past last')
     writer.end()
-    okay(reader.read(1), null, 'read end')
     await end
+    okay(gathered, [ 'x', 'y', 'z' ], 'gathered')
 }

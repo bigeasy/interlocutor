@@ -13,6 +13,7 @@ function Reader (options) {
     this._dump = false
     this._unpaused = noop
     stream.Readable.call(this, coalesce(options, {}))
+    console.log('>>>', this.readableFlowing)
 }
 util.inherits(Reader, stream.Readable)
 
@@ -29,7 +30,7 @@ Reader.prototype._read = function () {
 }
 
 Reader.prototype._write = function (chunk) {
-    if (!this._dump) {
+    if (! this._dump) {
         this._ended = chunk == null
         this._paused = ! this.push(chunk)
     }

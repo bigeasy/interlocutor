@@ -20,9 +20,10 @@
     },
     "dependencies":
     {
+                            "comeuppance":                  "0.0.1",
+                            "eject":                        "0.2.0",
                             "extant":                       "^1.0.15",
-                            "nop":                          "1.0.0",
-                            "prospective":                  "0.3.0"
+                            "nop":                          "1.0.0"
     },
     "devDependencies":
     {
