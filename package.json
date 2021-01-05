@@ -1,6 +1,6 @@
 {
     "name":                 "interlocutor",
-    "version":              "1.0.5",
+    "version":              "1.0.6",
     "description":
 
       "Invoke Sencha Connect middleware without an HTTP server.",
