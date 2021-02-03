@@ -3,7 +3,7 @@ var util = require('util')
 var assert = require('assert')
 var http = require('http')
 var Writer = require('./writer')
-var coalesce = require('extant')
+var { coalesce } = require('extant')
 
 function Response (request, response) {
     this._request = request

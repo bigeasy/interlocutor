@@ -9,7 +9,7 @@ var Server = {
 }
 var stream = require('stream')
 var events = require('events')
-var coalesce = require('extant')
+var { coalesce } = require('extant')
 
 function Interlocutor (middleware) {
     this._middleware = middleware

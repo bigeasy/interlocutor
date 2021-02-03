@@ -7,7 +7,7 @@ var stream = require('stream')
 const noop = require('nop')
 
 // Return the first non-null-like value.
-var coalesce = require('extant')
+var { coalesce } = require('extant')
 
 function Reader (options) {
     this._dump = false
