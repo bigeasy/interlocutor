@@ -25,7 +25,7 @@
     },
     "dependencies":
     {
-                            "comeuppance":                  "0.0.1",
+                            "comeuppance":                  "0.0.3",
                             "eject":                        "0.2.3",
                             "extant":                       "^2.0.0-alpha.0",
                             "nop":                          "1.0.0"
