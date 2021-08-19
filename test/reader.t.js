@@ -1,7 +1,7 @@
 require('proof')(3, prove)
 
 async function prove (okay) {
-    const callback = require('comeuppance')
+    const { callback } = require('comeuppance')
     var Writer = require('../writer')
     var Reader = require('../reader')
     var reader = new Reader({ highWaterMark: 1 })
