@@ -13,6 +13,11 @@
     "homepage":             "https://github.com/bigeasy/interlocutor",
     "bugs":                 "https://github.com/bigeasy/interlocutor/issues",
     "license":              "MIT",
+    "contributors":
+    [{
+                            "name":  "Alec Larson",
+                            "web":   "https://github.com/aleclarson"
+    }],
     "repository":
     {
                             "type": "git",
