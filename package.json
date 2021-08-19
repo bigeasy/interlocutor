@@ -27,7 +27,7 @@
     {
                             "comeuppance":                  "0.0.3",
                             "eject":                        "0.3.0",
-                            "extant":                       "^2.0.0-alpha.3",
+                            "extant":                       "2.0.0-alpha.3",
                             "nop":                          "1.0.0"
     },
     "devDependencies":
